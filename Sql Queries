@@ -7,7 +7,8 @@ select count(distinct branch) as stores from walmart
 
 select max(quantity) as highest from walmart 
 
-# business problems
+# Business Problems
+
 #1) Find different payment methods,no.of transactions,num qty sold
 
 select payment_method,count(*) as total_count,sum(quantity) as total_quaty
@@ -15,6 +16,7 @@ from walmart
 group by payment_method
 
 #2)identify the highest-average rated category in each branch,displaying the branch,category
+
 select branch,category,avg_rate from
 (select branch,category,
 round(avg(rating),1) as avg_rate,
@@ -24,6 +26,7 @@ group by 1,2) v
 where rnk = 1
 
 #3) Busiest day based on no.of transactions in each branch
+
 select branch, day_name,cnt
 from(
 select branch,dayname (date) as day_name,count(*) as cnt,
@@ -48,11 +51,10 @@ from walmart
 group by category
 order by 3 desc
 
-select category,sum(unit_price*quantity* profit_margin) as total_profit
-from walmart 
-group by category
 
 #6) dtermine the most commom payment methods fro each branch.diplsy branch  and preferred payment methode
+
+
 select  branch,payment_method, cnt from(
 select branch,payment_method,count(*) as cnt,
 rank()over(partition by branch order by count(*) desc) as rnk
@@ -62,7 +64,22 @@ order by 1
 ) c
 where rnk =1
 
-#7) categorize sales in to 3 groups morning,afternoon,Evening
+#7) Determine the most common payment method for each branch
+
+WITH cte AS (
+    SELECT 
+        branch,
+        payment_method,
+        COUNT(*) AS total_trans,
+        RANK() OVER(PARTITION BY branch ORDER BY COUNT(*) DESC) AS rank
+    FROM walmart
+    GROUP BY branch, payment_method
+)
+SELECT branch, payment_method AS preferred_payment_method
+FROM cte
+WHERE rank = 1;
+
+#8) categorize sales in to 3 groups morning,afternoon,Evening
 # find out each of the shift and no.of invoices
 
 with T1 as (
